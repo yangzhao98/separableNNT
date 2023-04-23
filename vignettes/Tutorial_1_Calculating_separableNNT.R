@@ -1,0 +1,105 @@
+## ----setup, include=FALSE-----------------------------------------------------
+knitr::opts_chunk$set(eval=FALSE, collapse=TRUE, comment="#>")
+
+## -----------------------------------------------------------------------------
+#  library(foreign)
+#  library(Hmisc)
+#  datPath <- "/Users/yangzhao/Library/CloudStorage/OneDrive-TheUniversityofHongKong/"
+#  prostate <- read.dta(paste(datPath,"prostate.dta",sep="")); #dim(prostate)
+#  prostate <- prostate[complete.cases(prostate),]; #dim(prostate)
+#  
+#  # All-cause death
+#  prostate$Yall <- prostate$status != "alive"
+#  
+#  # An indicator with 3 levels for causes of death
+#  # with(prostate,table(status));
+#  doCause <- with(prostate,levels(status))
+#  prostate$Y <- prostate$status
+#  levels(prostate$Y) <-
+#    list(alive="alive",
+#         pdeath="dead - prostatic ca",
+#         odeath=doCause[!doCause %in% c("alive","dead - prostatic ca")])
+#  # table(prostate$Y)
+#  
+#  # Exposure: reduce data to only include high dose DES (A=1) and placebo (A=0)
+#  # table(prostate$rx); levels(prostate$rx)
+#  datFA <- subset(prostate, rx %in% levels(rx)[c(3,4)])
+#  datFA$A <- datFA$rx %in% c("5.0 mg estrogen")
+#  datFA$X1 <- datFA$hg < 10
+#  datFA$X2 <- cut2(datFA$age,c(0,60,70,80,100))
+#  datFA$X3 <- datFA$pf == "normal activity"
+#  Xs <- c(paste("X",1:3,sep=""))
+#  datFA$Y <- as.integer(datFA$Y) - 1  # Recoding the 3 levels indicator
+#  datFA$Ycensor <- datFA$Y == 0       # An indicator for censoring
+#  cutTimes <- c(0:59)                 # Follow-up time for 5 years
+
+## -----------------------------------------------------------------------------
+#  library(separableNNT)
+#  datRes <- separableNNT(dat=datFA,
+#                         Y="Y", dTime="dtime", cutTimes=cutTimes,
+#                         eoiValue=1, crsValue=2, A="A", X=Xs, id="patno")
+#  knitr::kable(datRes$datResult[,4:10],
+#               caption="Estiamted separable effects by 60 months")
+#  knitr::kable(datRes$datCumulativeIncidence[
+#    datRes$datCumulativeIncidence$Time==37,c(3,5:6)],
+#               caption="Estimated cumulative incidence by 36 months under various treatments")
+#  
+
+## -----------------------------------------------------------------------------
+#  set.seed(123)
+#  system.time({
+#    datRes2 <- separableNNTCIs(dat=datFA,
+#                               Y="Y", eoiValue=1, crsValue=2,
+#                               dTime="dtime", cutTimes=cutTimes,
+#                               A="A", X=Xs, id="patno", nboot=50)
+#  })
+#  knitr::kable(datRes2$datResult[,c(2:3,5:7)],
+#               caption="Estiamted separable effects by 60 months with 95% CI")
+
+## ---- fig.cap="Cumulative incidence under various treatments"-----------------
+#  library(ggplot2)
+#  library(ggsci)
+#  mypal <- pal_jama(alpha=0.9)(7)
+#  pCIF <- ggplot(data=datRes$datCumulativeIncidence,
+#                 aes(x=Time,y=CIF,color=Group)) +
+#    geom_step() +
+#    theme_bw() +
+#    theme(legend.position=c(0.2,0.8),
+#          legend.title=element_blank()) +
+#    scale_x_continuous(name="Time since entry (months)",
+#                       breaks=seq(0,60,12),
+#                       limits=c(0,61), expand=c(0,0)) +
+#    scale_y_continuous(name="Cumulative incidence",
+#                       breaks=seq(0,0.3,0.1),
+#                       limits=c(0,0.3),expand=c(0,0)) +
+#    scale_color_manual(values=mypal)
+#  pCIF
+
+## ---- fig.cap="Restricted mean survival time under various treatment"---------
+#  datRMSTtreated <- datRes2$datBoots[
+#      datRes2$datBoots$Effect=="TE=Pr[Y(aY=1,aD=1)=1]-Pr[Y(aY=0,aD=0)=1]",
+#      c("Outcome","Effect","treatedRMST")]
+#  names(datRMSTtreated) <- c("Outcome","Effect","RMST")
+#  datRMSTtreated$Group <- "Pr[Y(aY=1,aD=1)=1]"
+#  datRMSTtreatAy <- datRes2$datBoots[
+#      datRes2$datBoots$Effect=="DE=Pr[Y(aY=1,aD=1)=1]-Pr[Y(aY=0,aD=1)=1]",
+#      c("Outcome","Effect","placeboRMST")]
+#  names(datRMSTtreatAy) <- c("Outcome","Effect","RMST")
+#  datRMSTtreatAy$Group <- "Pr[Y(aY=0,aD=1)=1]"
+#  datRMSTplacebo <- datRes2$datBoots[
+#      datRes2$datBoots$Effect=="IDE=Pr[Y(aY=0,aD=1)=1]-Pr[Y(aY=0,aD=0)=1]",
+#      c("Outcome","Effect","placeboRMST")]
+#  names(datRMSTplacebo) <- c("Outcome","Effect","RMST")
+#  datRMSTplacebo$Group <- "Pr[Y(aY=0,aD=0)=1]"
+#  datRMST <- rbind(datRMSTtreated,datRMSTplacebo,datRMSTtreatAy)
+#  pRMST <- ggplot(data=datRMST,aes(x=RMST,fill=Group,color=Group)) +
+#      geom_histogram(bins=100,alpha=0.1,position="dodge") +
+#      theme_bw() +
+#      theme(legend.position=c(0.2,0.9),legend.title=element_blank()) +
+#      scale_x_continuous(name="Restricted mean survial time (months)",
+#                         expand=c(0,0)) +
+#      scale_y_continuous(name="Frequency",expand=c(0,0)) +
+#      scale_fill_manual(values=mypal) +
+#      scale_color_manual(values=mypal)
+#  pRMST
+

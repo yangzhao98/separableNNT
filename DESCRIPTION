@@ -1,0 +1,15 @@
+Package: separableNNT
+Type: Package
+Title: NNT for Survival Endpoints based on Separable Effects
+Version: 0.1.0
+Date: 2023-04-23
+Author: Zhao Yang
+Maintainer: Zhao Yang <yangz98@connect.hku.hk>
+Description: Reproduce the proposed method in Yang et al.'s paper (2023) <doi:>, in which the Number Needed to Treat (NNT) for survival endpoint is calculated using separable effects in the presence of competing events proposed by Stensrud et al (2022) <doi:https://doi.org/10.1080/01621459.2020.1765783>. 
+Depends: R (>= 3.2.0)
+Imports: parallel, survival, stats
+Suggests: rmarkdown, knitr, ggplot2, ggsci, foreign, Hmisc
+License: GPL (>=2)
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+VignetteBuilder: knitr
