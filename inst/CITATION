@@ -2,11 +2,11 @@ citHeader("To cite separableNNT in publication use:")
 
 citEntry(entry = "Article",
          title = "Disentangling the inverse LDL-C-hemorrhagic stroke association in Chinese adults with hypertension: Findings from the Chinese Multi-provincial Cohort Study",
-         author= personList(as.person("Yang et al.")),
-         journal="Am J Epidemiol",
+         author= personList(as.person("Yang Z, Qi Y, Sun JY, Liu J, Wang M, Deng QJ, Hao YC, Yang N, Ji ZL, Zhou XH, Liu J.")),
+         journal="Am J Epidemiol (Revision)",
          year   = "2023",
          volume = "",
          number = "",
          pages. = "",
          url    = "",
-         textVersion = "Yang et al. (2023) Disentangling the inverse LDL-C-hemorrhagic stroke association in Chinese adults with hypertension: Findings from the Chinese Multi-provincial Cohort Study. Am J Epidemiol. (Revision)")
+         textVersion = "Yang Z, Qi Y, Sun JY, Liu J, Wang M, Deng QJ, Hao YC, Yang N, Ji ZL, Zhou XH, Liu J. (2023) Disentangling the inverse LDL-C-hemorrhagic stroke association in Chinese adults with hypertension: Findings from the Chinese Multi-provincial Cohort Study. Am J Epidemiol. (Revision)")
